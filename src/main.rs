@@ -2,31 +2,6 @@ use obsidian_export::{Exporter, WalkOptions};
 use std::{env, path::PathBuf};
 
 fn main() {
-    let _ = dotenvy::dotenv();
-    if PathBuf::from("temp").exists() {
-        std::fs::remove_dir_all("temp").unwrap();
-    }
-    std::fs::create_dir_all("temp").unwrap();
-    std::process::Command::new("git")
-        .arg("clone")
-        .arg(env::var("SOURCE_REPO").unwrap())
-        .arg("--depth")
-        .arg("1")
-        .arg("temp/source")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
-    std::process::Command::new("git")
-        .arg("clone")
-        .arg(env::var("TARGET_REPO").unwrap())
-        .arg("--depth")
-        .arg("1")
-        .arg("temp/target")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
     let mut exporter = Exporter::new(
         env::current_dir().unwrap().join("temp/source"),
         env::current_dir().unwrap().join("temp/target"),
@@ -49,31 +24,4 @@ fn main() {
     };
     exporter.walk_options(walk_options);
     exporter.run().unwrap();
-
-    std::process::Command::new("git")
-        .arg("add")
-        .arg(".")
-        .current_dir("temp/target")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
-
-    std::process::Command::new("git")
-        .arg("commit")
-        .arg("-m")
-        .arg("Update")
-        .current_dir("temp/target")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
-
-    std::process::Command::new("git")
-        .arg("push")
-        .current_dir("temp/target")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap();
 }
