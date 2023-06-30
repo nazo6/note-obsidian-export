@@ -11,7 +11,7 @@ fn main() {
             if entry.file_type().is_some_and(|t| t.is_file()) {
                 let content = std::fs::read_to_string(entry.path()).unwrap();
                 let Ok(Some(yaml)) = frontmatter::parse(&content) else { return false };
-                let publish = yaml["publish"].as_bool().unwrap();
+                let publish = yaml["publish"].as_bool().unwrap_or(false);
                 if publish {
                     println!("Adding items {:?} {}", entry.path(), publish);
                 }
